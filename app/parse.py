@@ -29,16 +29,15 @@ def get_price_from_cards(cards: list[WebElement]) -> list[float]:
     return [float(card.find_element(
         By.CSS_SELECTOR,
         "h4.price"
-    ).text.replace("$", ""))
-        for card in cards]
+    ).text.replace("$", ""))for card in cards]
 
 
 def get_rating_from_cards(cards: list[WebElement]) -> list[int]:
     return [len(card.find_elements(
-            By.CSS_SELECTOR,
-            "div.ratings > p:nth-child(2) > span"
-            ))
-            for card in cards]
+        By.CSS_SELECTOR,
+        "div.ratings > p:nth-child(2) > span"
+    ))
+        for card in cards]
 
 
 def get_reviews_from_cards(cards: list[WebElement]) -> list[int]:
@@ -94,10 +93,14 @@ def scrap(driver: WebDriver, file_url: str, url: str) -> None:
     ratings = get_rating_from_cards(cards)
     reviews = get_reviews_from_cards(cards)
     products = [
-        Product(title=titles[i],
-                description=descriptions[i],
-                price=prices[i], rating=ratings[i],
-                num_of_reviews=reviews[i]) for i in range(len(cards))]
+        Product(
+            title=titles[i],
+            description=descriptions[i],
+            price=prices[i], rating=ratings[i],
+            num_of_reviews=reviews[i]
+        )
+        for i in range(len(cards))
+    ]
 
     with open(file_url, "w", encoding="utf-8", newline="\n") as f:
         writer = csv.writer(f)
@@ -107,36 +110,24 @@ def scrap(driver: WebDriver, file_url: str, url: str) -> None:
 
 def get_all_products() -> None:
     driver = webdriver.Edge()
-    scrap(
-        driver,
-        "laptops.csv",
-        "https://webscraper.io/test-sites/e-commerce/more/computers/laptops"
-    )
-    scrap(
-        driver,
-        "tablets.csv",
-        "https://webscraper.io/test-sites/e-commerce/more/computers/tablets"
-    )
-    scrap(
-        driver,
-        "touch.csv",
-        "https://webscraper.io/test-sites/e-commerce/more/phones/touch"
-    )
-    scrap(
-        driver,
-        "home.csv",
-        "https://webscraper.io/test-sites/e-commerce/more"
-    )
-    scrap(
-        driver,
-        "computers.csv",
-        "https://webscraper.io/test-sites/e-commerce/more/computers"
-    )
-    scrap(
-        driver,
-        "phones.csv",
-        "https://webscraper.io/test-sites/e-commerce/more/phones"
-    )
+    urls = {
+        "laptops.csv":
+            "https://webscraper.io/test-sites/e-commerce/more/computers/"
+            "laptops",
+        "tablets.csv":
+            "https://webscraper.io/test-sites/e-commerce/more/computers/"
+            "tablets",
+        "touch.csv":
+            "https://webscraper.io/test-sites/e-commerce/more/phones/touch",
+        "home.csv":
+            "https://webscraper.io/test-sites/e-commerce/more",
+        "computers.csv":
+            "https://webscraper.io/test-sites/e-commerce/more/computers",
+        "phones.csv":
+            "https://webscraper.io/test-sites/e-commerce/more/phones",
+    }
+    for key in urls:
+        scrap(driver, key, urls[key])
 
 
 if __name__ == "__main__":
